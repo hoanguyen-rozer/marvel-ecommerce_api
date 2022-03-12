@@ -1,3 +1,15 @@
 from django.contrib import admin
 
-# Register your models here.
+from src.shops.models import Shop, ShopSetting
+
+
+@admin.register(Shop)
+class ShopModelAdmin(admin.ModelAdmin):
+    prepopulated_fields = {
+        'slug': ('name',)
+    }
+
+
+@admin.register(ShopSetting)
+class ShopSettingModelAdmin(admin.ModelAdmin):
+    pass

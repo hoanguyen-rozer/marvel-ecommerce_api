@@ -122,7 +122,7 @@ class UserLogoutAPIView(GenericAPIView):
         }
     )
     def post(self, request, *args, **kwargs):
-        logout(request)
+        # logout(request)
         data = {
             'message': "Successfully logged out",
             'success': True

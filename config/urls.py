@@ -23,6 +23,7 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from src.shops.views import ShopViewSet
 from src.users.views import ProfileViewSet, user_login_view, user_logout_view, AuthViewSet, verify_forgot_password
 
 schema_view = get_schema_view(
@@ -57,6 +58,10 @@ urlpatterns += profile_router.urls
 auth_router = DefaultRouter()
 auth_router.register(r'api', AuthViewSet, basename='auth')
 urlpatterns += auth_router.urls
+
+shop_router = DefaultRouter()
+shop_router.register(r'api/shops', ShopViewSet, basename='shop')
+urlpatterns += shop_router.urls
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

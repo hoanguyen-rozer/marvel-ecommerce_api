@@ -42,7 +42,9 @@ INSTALLED_APPS = [
 
     'src.users.apps.UsersConfig',
     'src.common.apps.CommonConfig',
-    # 'src.shops.apps.ShopsConfig',
+    'src.shops.apps.ShopsConfig',
+    'src.orders.apps.OrdersConfig',
+    'src.payments.apps.PaymentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -137,7 +139,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 10
 }
 
 SWAGGER_SETTINGS = {
