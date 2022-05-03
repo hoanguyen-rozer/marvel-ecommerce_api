@@ -3,8 +3,10 @@ from rest_framework.response import Response
 
 class UpdateModelMixin:
     """
-    Update a model instance.
+    Class reuse rest_framework's UpdateModelMixin class.
+    Update a model instance without patch method
     """
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()

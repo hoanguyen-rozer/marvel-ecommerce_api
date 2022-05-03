@@ -35,9 +35,11 @@ class ShopSerializer(serializers.ModelSerializer):
         }
 
     def get_orders_count(self, obj):
+        # TODO: get number of ordered products in the shop
         return 15
 
     def get_products_count(self, obj):
+        # TODO: get number of ordered products in the shop
         return 15
 
     def create(self, validated_data):
@@ -65,4 +67,4 @@ class ShopSerializer(serializers.ModelSerializer):
         return shop
 
     def update(self, instance, validated_data):
-        print('DATA: ', validated_data)
+        pass

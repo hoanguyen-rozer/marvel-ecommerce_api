@@ -14,6 +14,9 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    User serializer with profile and address
+    """
     profile = ProfileSerializer(required=False)
     address = AddressSerializer(many=True, required=False)
 
@@ -27,16 +30,22 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        """
+        Handler function that stores nested properties of the user serializer
+        """
         all_address_data = validated_data.pop('address', None)
         profile_data = validated_data.pop('profile', None)
         avatar_data = profile_data.pop('avatar', None)
         user = User.objects.create_user(**validated_data)
+
+        # Processing in case there is an avatar file
         if avatar_data:
             attachment = Attachment.objects.create(**avatar_data)
             Profile.objects.create(customer=user, **profile_data, avatar=attachment)
         else:
             Profile.objects.create(customer=user, **profile_data)
         if all_address_data:
+            # Multiple addresses are create
             for address in all_address_data:
                 user_address_data = address.pop('address', None)
                 user_address = UserAddress.objects.create(**user_address_data)
@@ -44,17 +53,31 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        """
+        Handler function that updates nested properties of the user serializer
+        """
         profile_data = validated_data.pop('profile')
+        address_data = validated_data.pop('address')
+        super(UserSerializer, self).update(instance, validated_data)
         profile = instance.profile
-        avatar_data = profile_data.pop('avatar_data', None)
+        avatar_data = profile_data.pop('avatar', None)
+
+        # Update in case there is an avatar file
         if avatar_data:
             avatar = profile.avatar
             avatar.thumbnail = avatar_data.get('thumbnail', avatar.thumbnail)
             avatar.original = avatar_data.get('original', avatar.original)
             avatar.save()
+        for attr, value in profile_data.items():
+            setattr(profile, attr, value)
+        profile.save()
+        return instance
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
+    """
+    Register user serializer
+    """
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
 
     class Meta:
@@ -67,6 +90,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         }
 
     def validate_password(self, value):
+        # user django's password validator to validate password value
         password_validation.validate_password(value)
         return value
 
@@ -76,6 +100,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class UserChangePasswordSerializer(serializers.Serializer):
+    """
+    User password change serializer
+    """
     old_password = serializers.CharField()
     new_password = serializers.CharField()
 
@@ -87,10 +114,12 @@ class UserChangePasswordSerializer(serializers.Serializer):
         print('CONTEXT: ', self.context)
         request = self.context['request']
         user = request.user
+        # check old user password
         if not user.check_password(value):
             raise serializers.ValidationError(detail=self.error_message['not_match'], code='not_match')
 
     def validate_new_password(self, value):
+        # user django's password validator to validate new password value
         password_validation.validate_password(value)
         return value
 
@@ -100,6 +129,9 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.Serializer):
+    """
+    User password reset serialzer contain fields which in order to assign for link is sent to user
+    """
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(write_only=True)
     uidb64 = serializers.CharField(write_only=True)
@@ -113,6 +145,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
+        # Check token in request
         try:
             password = attrs.get('password')
             token = attrs.get('token')

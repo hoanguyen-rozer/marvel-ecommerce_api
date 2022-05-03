@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse_lazy
@@ -54,15 +54,10 @@ class UserListAPIView(ListCreateAPIView):
 user_list_view = UserListAPIView.as_view()
 
 
-# class UserActiveAPIView(UpdateAPIView):
-#     serializer_class = UserSerializer
-#     queryset = User.objects.all()
-#     lookup_field = 'id'
-
-# def update(self, request, *args, **kwargs):
-#     pass
-
 class UserActiveAPIView(APIView):
+    """
+    Class update active status of user
+    """
 
     def post(self, request, *args, **kwargs):
         user_id = self.kwargs.get('id')
@@ -76,6 +71,9 @@ user_active_view = UserActiveAPIView.as_view()
 
 
 class UserBanAPIView(APIView):
+    """
+    Ban user API
+    """
 
     def post(self, request, *args, **kwargs):
         user_id = self.kwargs.get('id')
@@ -95,6 +93,9 @@ user_ban_view = UserBanAPIView.as_view()
 #     lookup_field = 'id'
 
 class ProfileViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+    """
+    Profile view set
+    """
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
     permission_classes = ()
@@ -103,6 +104,11 @@ class ProfileViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
 
 
 class UserLoginAPIView(TokenObtainPairView):
+    """
+    Class Login API which inherits simplejwt's view
+    """
+
+    # Set schema format for Swagger UI decorator
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: TokenObtainPairResponseSerializer,
@@ -116,6 +122,10 @@ user_login_view = UserLoginAPIView.as_view()
 
 
 class UserLogoutAPIView(GenericAPIView):
+    """
+    Class logout user API
+    """
+
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: NotificationSerializer,
@@ -123,6 +133,7 @@ class UserLogoutAPIView(GenericAPIView):
     )
     def post(self, request, *args, **kwargs):
         # logout(request)
+        # TODO: process access and refresh token
         data = {
             'message': "Successfully logged out",
             'success': True
@@ -134,6 +145,9 @@ user_logout_view = UserLogoutAPIView.as_view()
 
 
 class AuthViewSet(GenericViewSet):
+    """
+    Class define auth methods relate account and password
+    """
     permission_classes = [AllowAny]
 
     @action(methods=['POST'], detail=False, serializer_class=UserRegisterSerializer)
@@ -147,6 +161,8 @@ class AuthViewSet(GenericViewSet):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         print('USER: ', user)
+
+        # return token pair for client
         refresh = RefreshToken.for_user(user)
         data = {
             'refresh': str(refresh),
@@ -183,6 +199,8 @@ class AuthViewSet(GenericViewSet):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             uidb64 = urlsafe_base64_encode((smart_bytes(user.id)))
+
+            # Generate token reset password
             token = PasswordResetTokenGenerator().make_token(user)
             current_site = get_current_site(request=request).domain
             relative_link = reverse_lazy('verify_forgot_password', kwargs={'uidb64': uidb64, 'token': token})
@@ -214,6 +232,10 @@ class AuthViewSet(GenericViewSet):
 
 
 class VerifyForgotPasswordAPIView(GenericAPIView):
+    """
+    Class verify link reset password
+    """
+
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: NotificationSerializer
@@ -221,8 +243,10 @@ class VerifyForgotPasswordAPIView(GenericAPIView):
     )
     def get(self, request, uidb64, token):
         try:
+            # Get user id from url uidb
             user_id = smart_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id=user_id)
+            # Check user with token received
             if not PasswordResetTokenGenerator().check_token(user, token):
                 return Response(data={
                     'message': "Token is invalid, please request a new one",

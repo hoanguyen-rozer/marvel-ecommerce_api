@@ -4,6 +4,10 @@ from src.common.models import Attachment, Location
 
 
 class AttachmentSerializer(serializers.ModelSerializer):
+    """
+    Attachment model serializer
+    """
+
     class Meta:
         model = Attachment
         fields = '__all__'
@@ -19,12 +23,19 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    """
+        Location model serializer
+    """
+
     class Meta:
         model = Location
         fields = '__all__'
 
 
 class TokenObtainPairResponseSerializer(serializers.Serializer):
+    """
+    Format template for token pair class in Swagger UI
+    """
     access = serializers.CharField()
     refresh = serializers.CharField()
 
@@ -36,6 +47,9 @@ class TokenObtainPairResponseSerializer(serializers.Serializer):
 
 
 class NotificationSerializer(serializers.Serializer):
+    """
+    Format template for notification is returned in Swagger UI
+    """
     message = serializers.CharField()
     success = serializers.BooleanField()
 

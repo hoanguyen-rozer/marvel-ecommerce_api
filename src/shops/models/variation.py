@@ -2,6 +2,9 @@ from django.db import models
 
 
 class Variation(models.Model):
+    """
+    Variations of products
+    """
     title = models.CharField(max_length=254)
     price = models.FloatField()
     sku = models.CharField(max_length=100)

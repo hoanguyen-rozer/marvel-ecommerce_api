@@ -6,6 +6,9 @@ from django.core.files.base import ContentFile
 
 
 def generate_thumbnail(original_image, thumbnail_image):
+    """
+    Generate thumbnail file with size 128x128
+    """
     thumbnail_size = (128, 128)
     outfile = os.path.splitext(os.path.basename(original_image.name))[0] + '.thumbnail'
     try:
@@ -17,6 +20,7 @@ def generate_thumbnail(original_image, thumbnail_image):
             filename = os.path.splitext(os.path.basename(original_image.name))[0] + '_thumbnail.' + im.format.lower()
             print('FILENAME: ', filename, type(im), im)
             thumbnail_image = ContentFile(image_io.getvalue(), filename)
+            return thumbnail_image
     except IOError as e:
         print("Could not create a thumbnail for ", original_image)
         print(e)

@@ -4,6 +4,9 @@ from src.common.models import Attachment, CoreModel
 
 
 class TypeSetting(models.Model):
+    """
+    Settings relate user interface of shops
+    """
     in_home = models.BooleanField()
     layout_type = models.CharField(max_length=100)
     product_card = models.CharField(max_length=100)
@@ -19,6 +22,9 @@ class Type(CoreModel):
 
 
 class Banner(models.Model):
+    """
+    Banners in shop's user interface
+    """
     title = models.CharField(max_length=254, null=True, blank=True)
     description = models.CharField(max_length=254, null=True, blank=True)
     image = models.OneToOneField(Attachment, on_delete=models.SET_NULL, null=True, blank=True)
@@ -36,6 +42,9 @@ class Tag(CoreModel):
 
 
 class Category(CoreModel):
+    """
+    Categories of products
+    """
     name = models.CharField(max_length=100)
     slug = models.SlugField()
     details = models.CharField(max_length=254, null=True, blank=True)

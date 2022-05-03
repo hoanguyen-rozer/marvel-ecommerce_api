@@ -10,6 +10,9 @@ class AddressType(models.TextChoices):
 
 
 class UserAddress(models.Model):
+    """
+    Generic class contain fields relate address of an object
+    """
     street_address = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
@@ -20,6 +23,9 @@ class UserAddress(models.Model):
 
 
 class Address(CoreModel):
+    """
+    Class define addresses of one user
+    """
     title = models.CharField(max_length=255)
     default = models.BooleanField(default=False)
     address = models.OneToOneField(UserAddress, on_delete=models.CASCADE)

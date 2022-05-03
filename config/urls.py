@@ -26,6 +26,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from src.shops.views import ShopViewSet
 from src.users.views import ProfileViewSet, user_login_view, user_logout_view, AuthViewSet, verify_forgot_password
 
+# Set schema view for Swagger UI
 schema_view = get_schema_view(
     openapi.Info(
         title="Marvel API",
@@ -43,25 +44,36 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('src.users.urls')),
 
+    # Extra method relate account and password
     path('api/token/', user_login_view, name='user_login'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/logout/', user_logout_view, name='user_logout'),
     path('api/forgot_password/<uidb64>/<token>/', verify_forgot_password, name='verify_forgot_password'),
 
+    # Schema Swagger
     re_path(r'^docs/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
-profile_router = DefaultRouter()
-profile_router.register(r'api/profiles', ProfileViewSet, basename='profile')
-urlpatterns += profile_router.urls
+router = DefaultRouter()
 
-auth_router = DefaultRouter()
-auth_router.register(r'api', AuthViewSet, basename='auth')
-urlpatterns += auth_router.urls
+# Profile url set
+router.register(r'api/profiles', ProfileViewSet, basename='profile')
 
-shop_router = DefaultRouter()
-shop_router.register(r'api/shops', ShopViewSet, basename='shop')
-urlpatterns += shop_router.urls
+# Auth url set
+router.register(r'api', AuthViewSet, basename='auth')
 
+# Shop url set
+router.register(r'api/shops', ShopViewSet, basename='shop')
+urlpatterns += router.urls
+
+# auth_router = DefaultRouter()
+# auth_router.register(r'api', AuthViewSet, basename='auth')
+# urlpatterns += auth_router.urls
+
+# shop_router = DefaultRouter()
+# shop_router.register(r'api/shops', ShopViewSet, basename='shop')
+# urlpatterns += shop_router.urls
+
+# Media file url
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
